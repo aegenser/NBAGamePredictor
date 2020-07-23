@@ -39,8 +39,8 @@ def scrapeGame(year, month, day, team):
     soup = bsoup(client, 'lxml')
     body = soup.body
 
-    # other_scores = body.find(id='all_other_scores')
-    # print(other_scores.get('class'))
+    other_scores = body.find(id='other_scores_link')
+    game.is_playoff_game = ("Series" in other_scores.get('data-label'))
 
     div = body.find('div', {'class' : 'content_grid'}) # this is the table
     # before the table for the away team players
@@ -48,7 +48,7 @@ def scrapeGame(year, month, day, team):
     game.away_team = awayTable['class'][1][-3:]
     game.home_team = team
 
-
+    score = 0
     row = awayTable.find_next('tbody').find_next('tr') # first row
     for _ in range(5):
         player = row.find_next(scope = 'row')
@@ -59,6 +59,8 @@ def scrapeGame(year, month, day, team):
         seconds = int(time[-2:]) # isolate seconds and minutes
         minutes = int(time[:-3])
         stat_line.min = minutes + seconds / 60
+
+        score -= int(row.find_next('td', {'data-stat' : 'plus_minus'}).text)
 
         stat_line.three_pt_attempts = int(row.find_next('td', {'data-stat' : 'fg3a'}).text)
         stat_line.three_pt_made = int(row.find_next('td', {'data-stat' : 'fg3'}).text)
@@ -73,8 +75,6 @@ def scrapeGame(year, month, day, team):
         stat_line.blk = int(row.find_next('td', {'data-stat' : 'blk'}).text)
         stat_line.tov = int(row.find_next('td', {'data-stat' : 'tov'}).text)
         stat_line.pf = int(row.find_next('td', {'data-stat' : 'pf'}).text)
-
-        print(stat_line.two_pt_made)
 
         game.away_starters.append(stat_line)
         row = row.next_sibling.next_sibling # next row
@@ -91,6 +91,8 @@ def scrapeGame(year, month, day, team):
         minutes = int(time[:-3])
         stat_line.min = minutes + seconds / 60
 
+        score -= int(row.find_next('td', {'data-stat' : 'plus_minus'}).text)
+
         stat_line.three_pt_attempts = int(row.find_next('td', {'data-stat' : 'fg3a'}).text)
         stat_line.three_pt_made = int(row.find_next('td', {'data-stat' : 'fg3'}).text)
         stat_line.two_pt_attempts = int(row.find_next('td', {'data-stat' : 'fga'}).text) - stat_line.three_pt_attempts
@@ -105,10 +107,11 @@ def scrapeGame(year, month, day, team):
         stat_line.tov = int(row.find_next('td', {'data-stat' : 'tov'}).text)
         stat_line.pf = int(row.find_next('td', {'data-stat' : 'pf'}).text)
 
-        print(stat_line.two_pt_made)
-
         game.away_bench.append(stat_line)
         row = row.next_sibling.next_sibling
+
+    game.result = score / 5
+    print(game.result)
     homeTable = awayTable.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling
     homeTable = homeTable.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling
     row = homeTable.find_next('tbody').find_next('tr')
@@ -135,8 +138,6 @@ def scrapeGame(year, month, day, team):
         stat_line.blk = int(row.find_next('td', {'data-stat' : 'blk'}).text)
         stat_line.tov = int(row.find_next('td', {'data-stat' : 'tov'}).text)
         stat_line.pf = int(row.find_next('td', {'data-stat' : 'pf'}).text)
-
-        print(stat_line.two_pt_made)
 
         game.home_starters.append(stat_line)
         row = row.next_sibling.next_sibling # next row
@@ -166,8 +167,6 @@ def scrapeGame(year, month, day, team):
         stat_line.blk = int(row.find_next('td', {'data-stat' : 'blk'}).text)
         stat_line.tov = int(row.find_next('td', {'data-stat' : 'tov'}).text)
         stat_line.pf = int(row.find_next('td', {'data-stat' : 'pf'}).text)
-
-        print(stat_line.two_pt_made)
 
         game.home_bench.append(stat_line)
         row = row.next_sibling.next_sibling
