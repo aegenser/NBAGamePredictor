@@ -35,7 +35,11 @@ def scrapeGame(year, month, day, team):
     myUrl = 'https://www.basketball-reference.com/boxscores/' \
              + year + month + day + '0' + team + '.html'
 
-    client = urllib.request.urlopen(myUrl).read()
+    try:
+        client = urllib.request.urlopen(myUrl).read()
+    except:
+        return None
+
     soup = bsoup(client, 'lxml')
     body = soup.body
 
