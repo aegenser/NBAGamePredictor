@@ -1,7 +1,7 @@
 TEAMS = ["NYK", "MIA", "SAS", "CHA", "CHH", "CHO", "PHI", "POR"\
         , "PHO", "UTA", "IND", "HOU", "LAC", "TOR", "SAC", "MIN"\
         , "ATL", "DAL", "CLE", "ORL", "CHI", "BOS", "MIL", "NJN"\
-        , "BKN", "LAL", "SEA", "OKC", "VAN", "MEM", "DET", "DEN"\
+        , "BRK", "LAL", "SEA", "OKC", "VAN", "MEM", "DET", "DEN"\
         , "WAS", "GSW", "NOP", "NOK", "NOH"]
 
 # stat scaling constants:
@@ -23,4 +23,13 @@ FG0_3A_SCLR = 10
 FG3_10A_SCLR = 10
 FG10_16A_SCLR = 4.6
 FG16_XXA_SCLR = 5.9
+
+AGE_MIN = 18 * 365
+AGE_SCLR = 22 * 365
+
+WEIGHT_MIN = 150
+WEIGHT_SCLR = (325 - WEIGHT_MIN)
+
+HEIGHT_MIN = 68
+HEIGHT_SCLR = (87 - HEIGHT_MIN)
 

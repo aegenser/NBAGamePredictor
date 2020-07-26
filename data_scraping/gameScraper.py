@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup as bsoup
 import urllib.request
+import datetime
 
 class Game:
-    def __init__(self):
+    def __init__(self, year, month, day):
+        self.date = datetime.date(int(year), int(month), int(day))
         self.home_team = None
         self.away_team = None
         self.home_starters = []
@@ -31,7 +33,6 @@ class StatLine:
         self.min = 0
 
 def scrapeGame(year, month, day, team):
-    game = Game()
     myUrl = 'https://www.basketball-reference.com/boxscores/' \
              + year + month + day + '0' + team + '.html'
 
@@ -40,6 +41,9 @@ def scrapeGame(year, month, day, team):
     except:
         return None
 
+    game = Game(year, month, day)
+
+    print('scraping game: ' + year + month + day + '0' + team)
     soup = bsoup(client, 'lxml')
     body = soup.body
 
@@ -57,7 +61,7 @@ def scrapeGame(year, month, day, team):
     for _ in range(5):
         player = row.find_next(scope = 'row')
         stat_line = StatLine()
-        stat_line.playertag = player.get('data-append-csv')
+        stat_line.tag = player.get('data-append-csv')
 
         time = player.find_next('td').string
         seconds = int(time[-2:]) # isolate seconds and minutes
@@ -86,10 +90,10 @@ def scrapeGame(year, month, day, team):
     while(row != None): # do the same for the bench players
         player = row.find_next( scope = 'row' )
         stat_line = StatLine()
-        stat_line.playertag = player.get('data-append-csv')
+        stat_line.tag = player.get('data-append-csv')
         time = player.find_next('td').string
 
-        if 'Not' in time:
+        if 'Not' in time or 'ed' in time:
             break
         seconds = int(time[-2:])
         minutes = int(time[:-3])
@@ -114,15 +118,14 @@ def scrapeGame(year, month, day, team):
         game.away_bench.append(stat_line)
         row = row.next_sibling.next_sibling
 
-    game.result = score / 5
-    print(game.result)
-    homeTable = awayTable.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling
-    homeTable = homeTable.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling
+    game.result = score / 5 # divide by 5 because sum of +/- should be five times the end of score
+
+    homeTable = awayTable.find_next(id=('all_box-' + team + '-game-basic'))
     row = homeTable.find_next('tbody').find_next('tr')
     for _ in range(5):
         player = row.find_next(scope = 'row')
         stat_line = StatLine()
-        stat_line.playertag = player.get('data-append-csv')
+        stat_line.tag = player.get('data-append-csv')
 
         time = player.find_next('td').string
         seconds = int(time[-2:]) # isolate seconds and minutes
@@ -149,10 +152,10 @@ def scrapeGame(year, month, day, team):
     while(row != None): # do the same for the bench players
         player = row.find_next( scope = 'row' )
         stat_line = StatLine()
-        stat_line.playertag = player.get('data-append-csv')
+        stat_line.tag = player.get('data-append-csv')
         time = player.find_next('td').string
 
-        if 'Not' in time:
+        if 'Not' in time or 'ed' in time:
             break
         seconds = int(time[-2:])
         minutes = int(time[:-3])
