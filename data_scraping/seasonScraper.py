@@ -5,6 +5,7 @@ import gameScraper
 import playerScraper
 import datetime
 import time
+import pickle
 
 def initialize_player():
     player = {}
@@ -45,6 +46,11 @@ def processGame(game, players, players_this_season, players_this_postseason, tea
     # - days since last game (max 7)
     # Players:
     # - stuff
+    new_row.append(game.date.year)
+    new_row.append(game.date.month)
+    new_row.append(game.date.day)
+    new_row.append(constant.TEAMS.index(game.home_team))
+    new_row.append(constant.TEAMS.index(game.away_team))
     if game.is_playoff_game:
         new_row.append(1.0)
     else:
@@ -153,8 +159,8 @@ def processGame(game, players, players_this_season, players_this_postseason, tea
         if player not in players_this_postseason:
             players_this_postseason[player] = initialize_player()
 
-        player_data.append(round((players_this_postseason[player]['g'] / constant.G_SCLR), 3))
-        player_data.append(round((players_this_postseason[player]['gs'] / constant.G_SCLR), 3))
+        player_data.append(round((players_this_postseason[player]['g'] / constant.PLF_G_SCLR), 3))
+        player_data.append(round((players_this_postseason[player]['gs'] / constant.PLF_G_SCLR), 3))
         player_data.append(round(safe_divide(players_this_postseason[player]['mp'], players_this_postseason[player]['g']) / constant.MP_SCLR, 3))
         player_data.append(round(safe_divide(players_this_postseason[player]['orb'], players_this_postseason[player]['g']) / constant.ORB_SCLR, 3))
         player_data.append(round(safe_divide(players_this_postseason[player]['drb'], players_this_postseason[player]['g']) / constant.DRB_SCLR, 3))
@@ -314,6 +320,8 @@ def scrapeSeason(start_year, start_month, start_day, end_year, end_month, end_da
                 processGame(game, players, players_this_season, players_this_postseason, teams, season, data)
         if day == 31:
             day = 1
+            with open('players.dictionary', 'wb') as f:
+                pickle.dump(players, f)
             if month == 12:
                 month = 1
                 year += 1
@@ -331,6 +339,45 @@ def scrapeSeason(start_year, start_month, start_day, end_year, end_month, end_da
                 pickle.dump(teams, f)
             break
 
-    
+def scrapeSeasonV2(players, season, data):
+    players_this_season = {}
+    players_this_postseason = {}
+    teams = {}
+    for month in constant.MONTHS:
+        myUrl = 'https://www.basketball-reference.com/leagues/NBA_20' + season + '_games-' + month + '.html'
+
+        try:
+            client = urllib.request.urlopen(myUrl).read()
+        except:
+            continue
+
+        soup = bsoup(client, 'lxml')
+        body = soup.body
+        working = body.find(id='all_schedule')
+        tableBody = working.find('tbody')
+        tableRow = tableBody.find_next('tr')
+        while(tableRow != None):
+            working = tableRow.find_next('th')
+            if 'csk' in working.attrs:
+                game_tag = working['csk']
+                strYear = game_tag[0:4]
+                strMonth = game_tag[4:6]
+                strDay = game_tag[6:8]
+                team = game_tag[9:12]
+                time.sleep(1)
+                game = gameScraper.scrapeGame(strYear, strMonth, strDay, team)
+                if game != None:
+                    processGame(game, players, players_this_season, players_this_postseason, teams, season, data)
+            tableRow = tableRow.next_sibling.next_sibling
+
+        with open('players.dictionary', 'wb') as f:
+                pickle.dump(players, f)
+
+    with open(season + 'players.dictionary', 'wb') as f:
+                pickle.dump(players_this_season, f)
+    with open(season + 'players_playoffs.dictionary', 'wb') as f:
+        pickle.dump(players_this_postseason, f)
+    with open(season + 'teams.dictionary', 'wb') as f:
+        pickle.dump(teams, f)
 
     

@@ -1,8 +1,11 @@
-TEAMS = ["NYK", "MIA", "SAS", "CHA", "CHH", "CHO", "PHI", "POR"\
-        , "PHO", "UTA", "IND", "HOU", "LAC", "TOR", "SAC", "MIN"\
-        , "ATL", "DAL", "CLE", "ORL", "CHI", "BOS", "MIL", "NJN"\
-        , "BRK", "LAL", "SEA", "OKC", "VAN", "MEM", "DET", "DEN"\
-        , "WAS", "GSW", "NOP", "NOK", "NOH"]
+TEAMS = ['ATL', 'BOS', 'BRK', 'CHA', 'CHH', 'CHI', 'CHO', \
+         'CLE', 'DAL', 'DEN', 'DET', 'GSW', 'HOU', 'IND', \
+         'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN', 'NJN', \
+         'NOH', 'NOK', 'NOP', 'NYK', 'OKC', 'ORL', 'PHI', \
+         'PHO', 'POR', 'SAC', 'SAS', 'SEA', 'TOR', 'UTA', \
+         'VAN', 'WAS']
+
+MONTHS = ['october', 'november', 'december', 'january', 'february', 'march', 'april', 'may', 'june']
 
 # stat scaling constants:
 

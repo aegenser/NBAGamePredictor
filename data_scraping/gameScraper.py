@@ -2,6 +2,12 @@ from bs4 import BeautifulSoup as bsoup
 import urllib.request
 import datetime
 
+def safe_int(s):
+    if len(s) == 0:
+        return 0
+    else:
+        return int(s)
+
 class Game:
     def __init__(self, year, month, day):
         self.date = datetime.date(int(year), int(month), int(day))
@@ -68,7 +74,7 @@ def scrapeGame(year, month, day, team):
         minutes = int(time[:-3])
         stat_line.min = minutes + seconds / 60
 
-        score -= int(row.find_next('td', {'data-stat' : 'plus_minus'}).text)
+        score -= safe_int(row.find_next('td', {'data-stat' : 'plus_minus'}).text)
 
         stat_line.three_pt_attempts = int(row.find_next('td', {'data-stat' : 'fg3a'}).text)
         stat_line.three_pt_made = int(row.find_next('td', {'data-stat' : 'fg3'}).text)
@@ -99,7 +105,7 @@ def scrapeGame(year, month, day, team):
         minutes = int(time[:-3])
         stat_line.min = minutes + seconds / 60
 
-        score -= int(row.find_next('td', {'data-stat' : 'plus_minus'}).text)
+        score -= safe_int(row.find_next('td', {'data-stat' : 'plus_minus'}).text)
 
         stat_line.three_pt_attempts = int(row.find_next('td', {'data-stat' : 'fg3a'}).text)
         stat_line.three_pt_made = int(row.find_next('td', {'data-stat' : 'fg3'}).text)
