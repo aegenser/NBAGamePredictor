@@ -5,7 +5,7 @@ TEAMS = ['ATL', 'BOS', 'BRK', 'CHA', 'CHH', 'CHI', 'CHO', \
          'PHO', 'POR', 'SAC', 'SAS', 'SEA', 'TOR', 'UTA', \
          'VAN', 'WAS']
 
-MONTHS = ['october', 'november', 'december', 'january', 'february', 'march', 'april', 'may', 'june']
+MONTHS = ['october', 'november'] # , 'december', 'january', 'february', 'march', 'april', 'may', 'june']
 
 # stat scaling constants:
 
